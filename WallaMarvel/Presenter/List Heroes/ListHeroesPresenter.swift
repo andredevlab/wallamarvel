@@ -12,17 +12,17 @@ protocol ListHeroesUI: AnyObject {
 
 enum ListHeroesState {
     case loading
-    case loaded([CharacterDataModel])
+    case loaded([CharacterModel])
     case empty
     case error(Error)
 }
 
 final class ListHeroesPresenter: ListHeroesPresenterProtocol {
     var ui: ListHeroesUI?
-    private let getHeroesUseCase: GetHeroesUseCaseProtocol
+    private let getCharactersListUseCase: GetCharactersListUseCase
     
-    init(getHeroesUseCase: GetHeroesUseCaseProtocol = GetHeroes()) {
-        self.getHeroesUseCase = getHeroesUseCase
+    init(getCharactersListUseCase: GetCharactersListUseCase) {
+        self.getCharactersListUseCase = getCharactersListUseCase
     }
     
     func screenTitle() -> String {
@@ -33,16 +33,15 @@ final class ListHeroesPresenter: ListHeroesPresenterProtocol {
     
     func getHeroes() {
         ui?.render(state: .loading)
-        getHeroesUseCase.execute { result in
+        getCharactersListUseCase.execute { result in
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
                 switch result {
-                case .success(let container):
-                    let heroes = container.characters
-                    if heroes.isEmpty {
+                case .success(let characters):
+                    if characters.isEmpty {
                         ui?.render(state: .empty)
                     } else {
-                        ui?.render(state: .loaded(heroes))
+                        ui?.render(state: .loaded(characters))
                     }
                 case .failure(let error):
                     ui?.render(state: .error(error))

@@ -1,17 +1,10 @@
 import Foundation
 
-protocol APIClientProtocol {
-    func getHeroes(completionBlock: @escaping (Result<CharacterDataContainer, Error>) -> Void)
+protocol APIClient {
+    func getHeroes(completionBlock: @escaping (Result<CharacterContainerDTO, Error>) -> Void)
 }
 
-enum APIClientError: Error {
-    case network(Error)
-    case decoding(Error)
-    case noData
-    case unknown
-}
-
-final class APIClient: APIClientProtocol {
+final class APIClientImpl: APIClient {
     enum Constant {
         static let privateKey = "188f9a5aa76846d907c41cbea6506e4cc455293f"
         static let publicKey = "d575c26d5c746f623518e753921ac847"
@@ -19,7 +12,7 @@ final class APIClient: APIClientProtocol {
     
     init() { }
     
-    func getHeroes(completionBlock: @escaping (Result<CharacterDataContainer, Error>) -> Void) {
+    func getHeroes(completionBlock: @escaping (Result<CharacterContainerDTO, Error>) -> Void) {
         let ts = String(Int(Date().timeIntervalSince1970))
         let privateKey = Constant.privateKey
         let publicKey = Constant.publicKey
@@ -48,7 +41,7 @@ final class APIClient: APIClientProtocol {
             }
             
             do {
-                let dataModel = try JSONDecoder().decode(CharacterDataContainer.self, from: data)
+                let dataModel = try JSONDecoder().decode(CharacterContainerDTO.self, from: data)
                 completionBlock(.success(dataModel))
             } catch {
                 completionBlock(.failure(APIClientError.decoding(error)))
