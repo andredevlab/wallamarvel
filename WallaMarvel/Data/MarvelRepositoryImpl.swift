@@ -7,14 +7,8 @@ final class MarvelRepositoryImpl: MarvelRepository {
         self.dataSource = dataSource
     }
     
-    func getHeroes(completionBlock: @escaping (Result<[CharacterModel], Error>) -> Void) {
-        dataSource.getHeroes { result in
-            switch result {
-            case .success(let dataContainer):
-                completionBlock(.success(CharacterMapper.map(dataContainer.characters)))
-            case .failure(let error):
-                completionBlock(.failure(error))
-            }  
-        }
+    func fetchCharacters(offset: Int, limit: Int) async throws -> [CharacterModel] {
+        let characterObjects = try await dataSource.fetchCharacters(offset: offset, limit: limit)
+        return CharacterMapper.map(characterObjects)
     }
 }

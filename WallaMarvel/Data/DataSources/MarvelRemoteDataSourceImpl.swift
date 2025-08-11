@@ -1,29 +1,25 @@
 import Foundation
+import CoreNetwork
 
 final class MarvelRemoteDataSourceImpl: MarvelRemoteDataSource {
-    private let apiClient: APIClient
+    private let characterService: CharacterService
     
-    init(apiClient: APIClient) {
-        self.apiClient = apiClient
+    init(characterService: CharacterService) {
+        self.characterService = characterService
     }
     
-    func getHeroes(completionBlock: @escaping (Result<CharacterContainerDTO, Error>) -> Void) {
-        apiClient.getHeroes { result in
-            guard case let .failure(error) = result else {
-                completionBlock(result)
-                return
-            }
-            
-            guard let error = error as? APIClientError else {
-                completionBlock(.failure(error))
-                return
-            }
-            
-            completionBlock(.failure(MarvelRemoteDataSourceImpl.handleAPIClientError(with: error)))
+    func fetchCharacters(offset: Int, limit: Int) async throws -> [CharacterDTO] {
+        do {
+            let response = try await characterService.fetchCharacters(offset: offset, limit: limit)
+            return response.data.results
+        } catch let error as NetworkError {
+            throw MarvelRemoteDataSourceImpl.handleAPIClientError(with: error)
+        } catch {
+            throw error
         }
     }
     
-    private static func handleAPIClientError(with error: APIClientError) -> MarvelDataSourceError {
+    private static func handleAPIClientError(with error: NetworkError) -> MarvelDataSourceError {
         MarvelDataSourceError.unknown
     }
 }
