@@ -7,7 +7,7 @@ class GetCharactersListUseCaseImpl: GetCharactersListUseCase {
         self.repository = repository
     }
     
-    func execute(completionBlock: @escaping (Result<[CharacterModel], Error>) -> Void) {
-        repository.getHeroes(completionBlock: completionBlock)
+    func execute(offset: Int, limit: Int) async throws -> [CharacterModel] {
+        try await repository.fetchCharacters(offset: offset, limit: limit)
     }
 }

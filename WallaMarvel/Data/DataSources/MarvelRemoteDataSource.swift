@@ -1,5 +1,6 @@
 import Foundation
+import CoreNetwork
 
 protocol MarvelRemoteDataSource {
-    func getHeroes(completionBlock: @escaping (Result<CharacterContainerDTO, Error>) -> Void)
+    func fetchCharacters(offset: Int, limit: Int) async throws -> [CharacterDTO]
 }

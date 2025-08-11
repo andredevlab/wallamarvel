@@ -1,4 +1,5 @@
 import UIKit
+import CoreNetwork
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -9,8 +10,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let window = UIWindow(windowScene: windowScene)
         
-        let apiClient = APIClientImpl()
-        let marvelRemoteDataSource = MarvelRemoteDataSourceImpl(apiClient: apiClient)
+        let characterService = CharacterServiceFactory.make()
+        let marvelRemoteDataSource = MarvelRemoteDataSourceImpl(characterService: characterService)
         let marvelRepository = MarvelRepositoryImpl(dataSource: marvelRemoteDataSource)
         let getCharactersListUseCase = GetCharactersListUseCaseImpl(repository: marvelRepository)
         let presenter = ListHeroesPresenter(getCharactersListUseCase: getCharactersListUseCase)

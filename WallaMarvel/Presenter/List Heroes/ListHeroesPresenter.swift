@@ -33,17 +33,20 @@ final class ListHeroesPresenter: ListHeroesPresenterProtocol {
     
     func getHeroes() {
         ui?.render(state: .loading)
-        getCharactersListUseCase.execute { result in
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                switch result {
-                case .success(let characters):
+        Task {
+            do {
+                let characters = try await getCharactersListUseCase.execute(offset: 0, limit: 20)
+                DispatchQueue.main.async { [weak self] in
+                    guard let self else { return }
                     if characters.isEmpty {
                         ui?.render(state: .empty)
                     } else {
                         ui?.render(state: .loaded(characters))
                     }
-                case .failure(let error):
+                }
+            } catch {
+                DispatchQueue.main.async { [weak self] in
+                    guard let self else { return }
                     ui?.render(state: .error(error))
                 }
             }

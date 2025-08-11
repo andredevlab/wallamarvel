@@ -40,7 +40,7 @@ Each phase delivers something functional and builds incrementally on the previou
 **Skills:**  
 - **Clean Architecture**: Data vs. Domain separation.  
 - **SOLID**: SRP (single responsibility), DIP (dependency inversion).  
-- **Design patterns**: Strategy (API fallback), Factory (request creation).  
+- **Design patterns**: Decorator (API fallback), Factory (CharacterService creation).  
 - Testability with `URLProtocol` mocks.  
 
 ---
