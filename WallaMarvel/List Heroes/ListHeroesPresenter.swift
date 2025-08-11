@@ -7,7 +7,14 @@ protocol ListHeroesPresenterProtocol: AnyObject {
 }
 
 protocol ListHeroesUI: AnyObject {
-    func update(heroes: [CharacterDataModel])
+    func render(state: ListHeroesState)
+}
+
+enum ListHeroesState {
+    case loading
+    case loaded([CharacterDataModel])
+    case empty
+    case error(Error)
 }
 
 final class ListHeroesPresenter: ListHeroesPresenterProtocol {
@@ -25,9 +32,22 @@ final class ListHeroesPresenter: ListHeroesPresenterProtocol {
     // MARK: UseCases
     
     func getHeroes() {
-        getHeroesUseCase.execute { characterDataContainer in
-            print("Characters \(characterDataContainer.characters)")
-            self.ui?.update(heroes: characterDataContainer.characters)
+        ui?.render(state: .loading)
+        getHeroesUseCase.execute { result in
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                switch result {
+                case .success(let container):
+                    let heroes = container.characters
+                    if heroes.isEmpty {
+                        ui?.render(state: .empty)
+                    } else {
+                        ui?.render(state: .loaded(heroes))
+                    }
+                case .failure(let error):
+                    ui?.render(state: .error(error))
+                }
+            }
         }
     }
 }

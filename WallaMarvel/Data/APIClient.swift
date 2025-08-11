@@ -1,7 +1,14 @@
 import Foundation
 
 protocol APIClientProtocol {
-    func getHeroes(completionBlock: @escaping (CharacterDataContainer) -> Void)
+    func getHeroes(completionBlock: @escaping (Result<CharacterDataContainer, Error>) -> Void)
+}
+
+enum APIClientError: Error {
+    case network(Error)
+    case decoding(Error)
+    case noData
+    case unknown
 }
 
 final class APIClient: APIClientProtocol {
@@ -12,7 +19,7 @@ final class APIClient: APIClientProtocol {
     
     init() { }
     
-    func getHeroes(completionBlock: @escaping (CharacterDataContainer) -> Void) {
+    func getHeroes(completionBlock: @escaping (Result<CharacterDataContainer, Error>) -> Void) {
         let ts = String(Int(Date().timeIntervalSince1970))
         let privateKey = Constant.privateKey
         let publicKey = Constant.publicKey
@@ -30,9 +37,22 @@ final class APIClient: APIClientProtocol {
         let urlRequest = URLRequest(url: urlComponent!.url!)
         
         URLSession.shared.dataTask(with: urlRequest) { data, response, error in
-            let dataModel = try! JSONDecoder().decode(CharacterDataContainer.self, from: data!)
-            completionBlock(dataModel)
-            print(dataModel)
+            guard error == nil else {
+                completionBlock(.failure(APIClientError.network(error!)))
+                return
+            }
+            
+            guard let data else {
+                completionBlock(.failure(APIClientError.noData))
+                return
+            }
+            
+            do {
+                let dataModel = try JSONDecoder().decode(CharacterDataContainer.self, from: data)
+                completionBlock(.success(dataModel))
+            } catch {
+                completionBlock(.failure(APIClientError.decoding(error)))
+            }
         }.resume()
     }
 }

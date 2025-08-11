@@ -1,7 +1,7 @@
 import Foundation
 
 protocol GetHeroesUseCaseProtocol {
-    func execute(completionBlock: @escaping (CharacterDataContainer) -> Void)
+    func execute(completionBlock: @escaping (Result<CharacterDataContainer, Error>) -> Void)
 }
 
 struct GetHeroes: GetHeroesUseCaseProtocol {
@@ -11,7 +11,7 @@ struct GetHeroes: GetHeroesUseCaseProtocol {
         self.repository = repository
     }
     
-    func execute(completionBlock: @escaping (CharacterDataContainer) -> Void) {
+    func execute(completionBlock: @escaping (Result<CharacterDataContainer, Error>) -> Void) {
         repository.getHeroes(completionBlock: completionBlock)
     }
 }
