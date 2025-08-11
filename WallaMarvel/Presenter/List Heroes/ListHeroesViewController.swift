@@ -18,23 +18,36 @@ final class ListHeroesViewController: UIViewController {
         
         title = presenter?.screenTitle()
         
+        // TODO: Refactor to avoid direct element access; expose component interactions through delegates instead.
         mainView.heroesTableView.delegate = self
+        mainView.retryButton.addTarget(self, action: #selector(retryTapped), for: .touchUpInside)
+        presenter?.getHeroes()
+    }
+    
+    @objc private func retryTapped() {
+        presenter?.getHeroes()
     }
 }
 
 extension ListHeroesViewController: ListHeroesUI {
-    func update(heroes: [CharacterDataModel]) {
-        listHeroesProvider?.heroes = heroes
+    func render(state: ListHeroesState) {
+        switch state {
+        case .loading:
+            mainView.update(state: .loading)
+        case .loaded(let heroes):
+            listHeroesProvider?.heroes = heroes
+            mainView.update(state: .content)
+        case .empty:
+            mainView.update(state: .empty)
+        case .error(let error):
+            mainView.update(state: .error(message: error.localizedDescription))
+        }
     }
 }
 
 extension ListHeroesViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let presenter = ListHeroesPresenter()
-        let listHeroesViewController = ListHeroesViewController()
-        listHeroesViewController.presenter = presenter
         
-        navigationController?.pushViewController(listHeroesViewController, animated: true)
     }
 }
 
