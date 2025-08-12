@@ -14,9 +14,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let marvelRemoteDataSource = MarvelRemoteDataSourceImpl(characterService: characterService)
         let marvelRepository = MarvelRepositoryImpl(dataSource: marvelRemoteDataSource)
         let getCharactersListUseCase = GetCharactersListUseCaseImpl(repository: marvelRepository)
-        let presenter = ListHeroesPresenter(getCharactersListUseCase: getCharactersListUseCase)
-        let listHeroesViewController = ListHeroesViewController()
-        listHeroesViewController.presenter = presenter
+        let presenter = ListHeroesPresenterImpl(getCharactersListUseCase: getCharactersListUseCase)
+        let listHeroesViewController = ListHeroesViewController(presenter: presenter)
         
         let navigationController = UINavigationController(rootViewController: listHeroesViewController)
         window.rootViewController = navigationController

@@ -1,11 +1,6 @@
-import Foundation
 import UIKit
 
-final class ListHeroesView: UIView {
-    enum Constant {
-        static let estimatedRowHeight: CGFloat = 120
-    }
-    
+final class CharacterListContentView: UIView {
     enum State {
         case loading
         case content
@@ -13,12 +8,10 @@ final class ListHeroesView: UIView {
         case error(message: String)
     }
 
-    lazy var heroesTableView: UITableView = {
+    private lazy var heroesTableView: UITableView = {
         let tableView = UITableView()
         tableView.register(ListHeroesTableViewCell.self, forCellReuseIdentifier: "ListHeroesTableViewCell")
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.rowHeight = UITableView.automaticDimension
-        tableView.estimatedRowHeight = Constant.estimatedRowHeight
         return tableView
     }()
     
@@ -36,7 +29,7 @@ final class ListHeroesView: UIView {
         return label
     }()
     
-    lazy var retryButton: UIButton = {
+    private lazy var retryButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Retry", for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -59,6 +52,8 @@ final class ListHeroesView: UIView {
         label.text = "No heroes found"
         return label
     }()
+    
+    private lazy var dataSource = makeDataSource()
     
     init() {
         super.init(frame: .zero)
@@ -103,7 +98,7 @@ final class ListHeroesView: UIView {
         ])
     }
     
-    func update(state: State) {
+    func update(state: ListHeroesState) {
         heroesTableView.isHidden = true
         errorStackView.isHidden = true
         emptyLabel.isHidden = true
@@ -111,16 +106,36 @@ final class ListHeroesView: UIView {
         switch state {
         case .loading:
             activityIndicator.startAnimating()
-        case .content:
+        case .loaded(let dataProvider):
             activityIndicator.stopAnimating()
             heroesTableView.isHidden = false
+            let snapshot = dataProvider.snapshot()
+            dataSource.apply(snapshot)
         case .empty:
             activityIndicator.stopAnimating()
             emptyLabel.isHidden = false
-        case .error(let message):
+        case .error(let error):
             activityIndicator.stopAnimating()
             errorStackView.isHidden = false
-            errorLabel.text = message
+            errorLabel.text = error.localizedDescription
+        case .idle:
+            break
+        }
+    }
+    
+    private func makeDataSource() -> UITableViewDiffableDataSource<CharacterListDataProvider.Section,
+                                                                   CharacterListDataProvider.Item> {
+        UITableViewDiffableDataSource(tableView: heroesTableView) { tableView, indexPath, item in
+            // TODO: - Move cell configuration to another component (Visitor or Configurator pattern)
+            switch item {
+            case .characterItem(let characterViewModel):
+                guard let cell = tableView.dequeueReusableCell(withIdentifier: "ListHeroesTableViewCell",
+                                                               for: indexPath) as? ListHeroesTableViewCell else {
+                    return UITableViewCell()
+                }
+                cell.configure(characterViewModel: characterViewModel)
+                return cell
+            }
         }
     }
 }

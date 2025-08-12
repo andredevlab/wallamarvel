@@ -1,53 +1,54 @@
 import UIKit
+import Combine
 
 final class ListHeroesViewController: UIViewController {
-    var mainView: ListHeroesView { return view as! ListHeroesView  }
+    private lazy var contentView: CharacterListContentView = {
+        let component = CharacterListContentView()
+        component.translatesAutoresizingMaskIntoConstraints = false
+        return component
+    }()
     
-    var presenter: ListHeroesPresenterProtocol?
-    var listHeroesProvider: ListHeroesAdapter?
+    private let presenter: ListHeroesPresenter
+    private var cancellables = Set<AnyCancellable>()
     
-    override func loadView() {
-        view = ListHeroesView()
+    init(presenter: ListHeroesPresenter) {
+        self.presenter = presenter
+        super.init(nibName: nil, bundle: nil)
     }
-
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        listHeroesProvider = ListHeroesAdapter(tableView: mainView.heroesTableView)
-        presenter?.getHeroes()
-        presenter?.ui = self
+        addSubviews()
+        addContraints()
         
-        title = presenter?.screenTitle()
-        
-        // TODO: Refactor to avoid direct element access; expose component interactions through delegates instead.
-        mainView.heroesTableView.delegate = self
-        mainView.retryButton.addTarget(self, action: #selector(retryTapped), for: .touchUpInside)
-        presenter?.getHeroes()
+        bind()
+        presenter.getHeroes()
     }
     
-    @objc private func retryTapped() {
-        presenter?.getHeroes()
+    private func addSubviews() {
+        view.addSubview(contentView)
+    }
+    
+    private func addContraints() {
+        NSLayoutConstraint.activate([
+            contentView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            contentView.topAnchor.constraint(equalTo: view.topAnchor),
+            contentView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        ])
+    }
+    
+    private func bind() {
+        presenter.statePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] state in
+                guard let self else { return }
+                contentView.update(state: state)
+            }
+            .store(in: &cancellables)
     }
 }
-
-extension ListHeroesViewController: ListHeroesUI {
-    func render(state: ListHeroesState) {
-        switch state {
-        case .loading:
-            mainView.update(state: .loading)
-        case .loaded(let heroes):
-            listHeroesProvider?.heroes = heroes
-            mainView.update(state: .content)
-        case .empty:
-            mainView.update(state: .empty)
-        case .error(let error):
-            mainView.update(state: .error(message: error.localizedDescription))
-        }
-    }
-}
-
-extension ListHeroesViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
-    }
-}
-

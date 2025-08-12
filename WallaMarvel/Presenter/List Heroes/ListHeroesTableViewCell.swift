@@ -3,13 +3,19 @@ import UIKit
 import Kingfisher
 
 final class ListHeroesTableViewCell: UITableViewCell {
-    private let heroeImageView: UIImageView = {
+    private lazy var contentStackView: UIStackView = {
+        let component = UIStackView()
+        component.translatesAutoresizingMaskIntoConstraints = false
+        return component
+    }()
+    
+    private lazy var heroeImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
     
-    private let heroeName: UILabel = {
+    private lazy var heroeName: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -31,29 +37,33 @@ final class ListHeroesTableViewCell: UITableViewCell {
     }
     
     private func addSubviews() {
-        addSubview(heroeImageView)
-        addSubview(heroeName)
+        contentStackView.spacing = 12
+        contentStackView.axis = .horizontal
+        
+        contentStackView.addArrangedSubview(heroeImageView)
+        contentStackView.addArrangedSubview(heroeName)
+        addSubview(contentStackView)
     }
     
     private func addContraints() {
         NSLayoutConstraint.activate([
-            heroeImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
-            heroeImageView.topAnchor.constraint(equalTo: topAnchor, constant: 12),
+            contentStackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
+            contentStackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
+            contentStackView.topAnchor.constraint(equalTo: topAnchor, constant: 12),
+            contentStackView.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -12),
+            
             heroeImageView.heightAnchor.constraint(equalToConstant: 80),
             heroeImageView.widthAnchor.constraint(equalToConstant: 80),
-            heroeImageView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -12),
-            
-            heroeName.leadingAnchor.constraint(equalTo: heroeImageView.trailingAnchor, constant: 12),
-            heroeName.topAnchor.constraint(equalTo: heroeImageView.topAnchor, constant: 8),
         ])
     }
     
-    func configure(model: CharacterModel) {
-        if let thumbnail = model.thumbnail {
-            let urlString = thumbnail.path + "/portrait_small." + thumbnail.extension
+    func configure(characterViewModel: CharacterViewModel) {
+        heroeName.text = characterViewModel.name
+        
+        if let thumbnailPath = characterViewModel.thumbnailPath,
+            let thumbnailExtension = characterViewModel.thumbnailExtension{
+            let urlString = thumbnailPath + "/portrait_small." + thumbnailExtension
             heroeImageView.kf.setImage(with: URL(string: urlString))
         }
-        
-        heroeName.text = model.name
     }
 }
