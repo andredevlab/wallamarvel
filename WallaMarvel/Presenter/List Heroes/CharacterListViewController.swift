@@ -1,17 +1,18 @@
 import UIKit
 import Combine
 
-final class ListHeroesViewController: UIViewController {
+final class CharacterListViewController: UIViewController {
     private lazy var contentView: CharacterListContentView = {
         let component = CharacterListContentView()
         component.translatesAutoresizingMaskIntoConstraints = false
+        component.delegate = self
         return component
     }()
     
-    private let presenter: ListHeroesPresenter
+    private let presenter: CharacterListPresenter
     private var cancellables = Set<AnyCancellable>()
     
-    init(presenter: ListHeroesPresenter) {
+    init(presenter: CharacterListPresenter) {
         self.presenter = presenter
         super.init(nibName: nil, bundle: nil)
     }
@@ -25,8 +26,10 @@ final class ListHeroesViewController: UIViewController {
         addSubviews()
         addContraints()
         
+        title = presenter.screenTitle()
+        
         bind()
-        presenter.getHeroes()
+        presenter.loadCharacters()
     }
     
     private func addSubviews() {
@@ -45,10 +48,16 @@ final class ListHeroesViewController: UIViewController {
     private func bind() {
         presenter.statePublisher
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] state in
+            .sink { [weak self] (state, dataProvider) in
                 guard let self else { return }
-                contentView.update(state: state)
+                contentView.update(state: state, dataProvider: dataProvider)
             }
             .store(in: &cancellables)
+    }
+}
+
+extension CharacterListViewController: CharacterListContentViewDelegate {
+    func didTapLoadMore() {
+        presenter.loadCharacters()
     }
 }

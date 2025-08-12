@@ -1,8 +1,10 @@
-import Foundation
 import UIKit
 import Kingfisher
 
-final class ListHeroesTableViewCell: UITableViewCell {
+final class CharacterItemViewCell: UITableViewCell {
+    
+    // MARK: - UI Components
+    
     private lazy var contentStackView: UIStackView = {
         let component = UIStackView()
         component.translatesAutoresizingMaskIntoConstraints = false
@@ -22,6 +24,8 @@ final class ListHeroesTableViewCell: UITableViewCell {
         return label
     }()
     
+    // MARK: - Initialization
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setup()
@@ -30,6 +34,13 @@ final class ListHeroesTableViewCell: UITableViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    override func prepareForReuse() {
+        heroeImageView.kf.cancelDownloadTask()
+        heroeImageView.image = nil
+    }
+    
+    // MARK: - Private Methods
     
     private func setup() {
         addSubviews()
@@ -57,13 +68,25 @@ final class ListHeroesTableViewCell: UITableViewCell {
         ])
     }
     
+    // MARK: - Internal Methods
+    
     func configure(characterViewModel: CharacterViewModel) {
         heroeName.text = characterViewModel.name
+        heroeImageView.kf.setImage(with: characterViewModel.imageURL)
         
-        if let thumbnailPath = characterViewModel.thumbnailPath,
-            let thumbnailExtension = characterViewModel.thumbnailExtension{
-            let urlString = thumbnailPath + "/portrait_small." + thumbnailExtension
-            heroeImageView.kf.setImage(with: URL(string: urlString))
-        }
+        heroeImageView.kf.indicatorType = .activity
+        
+        let size = CGSize(width: 160, height: 160)
+        let processor = ResizingImageProcessor(referenceSize: size, mode: .aspectFit)
+        
+        heroeImageView.kf.setImage(
+            with: characterViewModel.imageURL,
+            placeholder: UIImage(named: "placeholder"),
+            options: [
+                .processor(processor),
+                .scaleFactor(UIScreen.main.scale),
+                .cacheOriginalImage,
+                .backgroundDecode
+            ])
     }
 }

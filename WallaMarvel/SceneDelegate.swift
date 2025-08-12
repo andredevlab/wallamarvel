@@ -11,13 +11,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
         
         let characterService = CharacterServiceFactory.make()
-        let marvelRemoteDataSource = MarvelRemoteDataSourceImpl(characterService: characterService)
-        let marvelRepository = MarvelRepositoryImpl(dataSource: marvelRemoteDataSource)
-        let getCharactersListUseCase = GetCharactersListUseCaseImpl(repository: marvelRepository)
-        let presenter = ListHeroesPresenterImpl(getCharactersListUseCase: getCharactersListUseCase)
-        let listHeroesViewController = ListHeroesViewController(presenter: presenter)
+        let remoteDataSource = CharacterRemoteDataSourceImpl(characterService: characterService)
+        let localDataSource = CharacterLocalDataSourceImpl()
+        let characterRepository = CharacterRepositoryImpl(remoteDataSource: remoteDataSource,
+                                                       localDataSource: localDataSource)
+        let canLoadMoreCharactersUseCase = CanLoadMoreCharactersUseCaseImpl(repository: characterRepository)
+        let getCharactersListUseCase = GetCharactersListUseCaseImpl(repository: characterRepository)
+        let presenter = CharacterListPresenterImpl(getCharactersListUseCase: getCharactersListUseCase, 
+                                                   canLoadMoreCharactersUseCase: canLoadMoreCharactersUseCase)
+        let viewController = CharacterListViewController(presenter: presenter)
         
-        let navigationController = UINavigationController(rootViewController: listHeroesViewController)
+        let navigationController = UINavigationController(rootViewController: viewController)
         window.rootViewController = navigationController
         self.window = window
         self.window?.makeKeyAndVisible()

@@ -7,6 +7,15 @@ final class CharacterListDataProvider {
     
     enum Item: Hashable {
         case characterItem(CharacterViewModel)
+        case listState(ListState)
+    }
+    
+    enum ListState {
+        case loadMore
+        case loading
+        case error
+        case reachEnd
+        case empty
     }
 
     private var items: [CharacterViewModel] = []
@@ -15,10 +24,11 @@ final class CharacterListDataProvider {
         items.append(contentsOf: newItems)
     }
     
-    func snapshot() -> NSDiffableDataSourceSnapshot<Section, Item> {
+    func snapshot(with listState: ListState) -> NSDiffableDataSourceSnapshot<Section, Item> {
         var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
         snapshot.appendSections([.main])
         snapshot.appendItems(items.map { Item.characterItem($0) }, toSection: .main)
+        snapshot.appendItems([.listState(items.isEmpty ? .empty : listState)], toSection: .main)
         return snapshot
     }
 }

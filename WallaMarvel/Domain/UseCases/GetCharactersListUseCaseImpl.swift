@@ -1,13 +1,13 @@
 import Foundation
 
 class GetCharactersListUseCaseImpl: GetCharactersListUseCase {
-    private let repository: MarvelRepository
+    private let repository: CharacterRepository
     
-    init(repository: MarvelRepository) {
+    init(repository: CharacterRepository) {
         self.repository = repository
     }
     
-    func execute(offset: Int, limit: Int) async throws -> [CharacterModel] {
-        try await repository.fetchCharacters(offset: offset, limit: limit)
+    func execute() async throws -> [CharacterModel] {
+        try await repository.fetchCharacters()
     }
 }
