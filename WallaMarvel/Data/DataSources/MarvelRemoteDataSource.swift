@@ -1,6 +1,11 @@
 import Foundation
 import CoreNetwork
 
-protocol MarvelRemoteDataSource {
-    func fetchCharacters(offset: Int, limit: Int) async throws -> [CharacterDTO]
+protocol CharacterRemoteDataSource {
+    func fetchAll(page: Int) async throws -> CharacterResponseDTO
+}
+
+protocol CharacterLocalDataSource {
+    func fetchAll(page: Int) async throws -> [CharacterModel]
+    func save(page: Int, characters: [CharacterModel]) async
 }

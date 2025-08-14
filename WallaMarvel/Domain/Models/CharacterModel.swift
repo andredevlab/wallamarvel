@@ -1,7 +1,7 @@
 import Foundation
 
-struct CharacterModel {
+struct CharacterModel: Codable {
     let id: Int
     let name: String
-    let thumbnail: ThumbnailModel?
+    let image: URL
 }
