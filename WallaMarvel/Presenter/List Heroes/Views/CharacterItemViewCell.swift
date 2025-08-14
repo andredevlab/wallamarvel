@@ -70,9 +70,9 @@ final class CharacterItemViewCell: UITableViewCell {
     
     // MARK: - Internal Methods
     
-    func configure(characterViewModel: CharacterViewModel) {
-        heroeName.text = characterViewModel.name
-        heroeImageView.kf.setImage(with: characterViewModel.imageURL)
+    func configure(viewModel: CharacterListItemViewModel) {
+        heroeName.text = viewModel.name
+        heroeImageView.kf.setImage(with: viewModel.imageURL)
         
         heroeImageView.kf.indicatorType = .activity
         
@@ -80,7 +80,7 @@ final class CharacterItemViewCell: UITableViewCell {
         let processor = ResizingImageProcessor(referenceSize: size, mode: .aspectFit)
         
         heroeImageView.kf.setImage(
-            with: characterViewModel.imageURL,
+            with: viewModel.imageURL,
             placeholder: UIImage(named: "placeholder"),
             options: [
                 .processor(processor),

@@ -47,10 +47,6 @@ final class ListStateViewCell: UITableViewCell {
         return component
     }()
     
-    // MARK: - Private Properties
-    
-    private var state: CharacterListDataProvider.ListState = .empty
-    
     // MARK: - Initialization
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -88,14 +84,13 @@ final class ListStateViewCell: UITableViewCell {
     
     // MARK: - Internal Methods
     
-    func apply(state: CharacterListDataProvider.ListState) {
-        self.state = state
+    func configure(viewModel: CharacterListStateViewModel) {
         spinner.stopAnimating()
         icon.isHidden = true
         label.isHidden = false
         button.isHidden = true
         
-        switch state {
+        switch viewModel.state {
         case .loadMore:
             button.isHidden = false
             label.isHidden = true
@@ -115,6 +110,9 @@ final class ListStateViewCell: UITableViewCell {
         case .empty:
             icon.isHidden = false
             label.text = "No available data"
+            
+        case .idle:
+            break
         }
     }
 }

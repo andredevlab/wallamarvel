@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 protocol CharacterListPresenter: AnyObject {
-    var statePublisher: AnyPublisher<(CharacterListDataProvider.ListState, CharacterListDataProvider), Never> { get }
+    var statePublisher: AnyPublisher<(CharacterListState, CharacterListDataProvider), Never> { get }
     
     func screenTitle() -> String
     func loadCharacters()
@@ -12,16 +12,15 @@ final class CharacterListPresenterImpl: CharacterListPresenter {
     
     // MARK: Private Properties
     
-    @Published private var listState: CharacterListDataProvider.ListState = .loading
+    @Published private var listState: CharacterListState = .loading
     
     private let getCharactersListUseCase: GetCharactersListUseCase
     private let canLoadMoreCharactersUseCase: CanLoadMoreCharactersUseCase
-    private var characterListDataProvider = CharacterListDataProvider()
-    private var isLoading = false
+    private let characterListDataProvider: CharacterListDataProvider
     
     // MARK: Internal Properties
     
-    var statePublisher: AnyPublisher<(CharacterListDataProvider.ListState, CharacterListDataProvider), Never> {
+    var statePublisher: AnyPublisher<(CharacterListState, CharacterListDataProvider), Never> {
         $listState
             .map { [unowned self] in ($0, self.characterListDataProvider) }
             .eraseToAnyPublisher()
@@ -29,9 +28,12 @@ final class CharacterListPresenterImpl: CharacterListPresenter {
     
     // MARK: Initialization
     
-    init(getCharactersListUseCase: GetCharactersListUseCase, canLoadMoreCharactersUseCase: CanLoadMoreCharactersUseCase) {
+    init(getCharactersListUseCase: GetCharactersListUseCase, 
+         canLoadMoreCharactersUseCase: CanLoadMoreCharactersUseCase,
+         characterListDataProvider: CharacterListDataProvider) {
         self.getCharactersListUseCase = getCharactersListUseCase
         self.canLoadMoreCharactersUseCase = canLoadMoreCharactersUseCase
+        self.characterListDataProvider = characterListDataProvider
     }
     
     // MARK: Internal Methods
@@ -42,19 +44,15 @@ final class CharacterListPresenterImpl: CharacterListPresenter {
     }
     
     func loadCharacters() {
-        guard !isLoading else { return }
-        isLoading = true
         listState = .loading
         
         Task {
             do {
                 let characters = try await getCharactersListUseCase.execute()
-                characterListDataProvider.update(items: characters.map { CharacterViewModel(model: $0) })
+                characterListDataProvider.update(items: characters.map { CharacterListItemViewModel(model: $0) })
                 listState = canLoadMoreCharactersUseCase.execute() ? .loadMore : .reachEnd
-                isLoading = false
             } catch {
                 listState = canLoadMoreCharactersUseCase.execute() ? .error : .reachEnd
-                isLoading = false
             }
         }
     }

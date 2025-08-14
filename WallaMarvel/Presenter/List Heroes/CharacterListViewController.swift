@@ -2,14 +2,22 @@ import UIKit
 import Combine
 
 final class CharacterListViewController: UIViewController {
-    private lazy var contentView: CharacterListContentView = {
-        let component = CharacterListContentView()
-        component.translatesAutoresizingMaskIntoConstraints = false
-        component.delegate = self
-        return component
+    private lazy var charactersTableView: UITableView = {
+        let tableView = UITableView()
+        tableView.separatorStyle = .none
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.delegate = self
+        tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 24, right: 0)
+        
+        tableView.register(CharacterItemViewCell.self, forCellReuseIdentifier: "CharacterItemViewCell")
+        tableView.register(ListStateViewCell.self, forCellReuseIdentifier: "ListStateViewCell")
+        return tableView
     }()
     
     private let presenter: CharacterListPresenter
+    private var dataProvider: CharacterListDataProvider?
+    private lazy var dataSource = makeDataSource()
+    
     private var cancellables = Set<AnyCancellable>()
     
     init(presenter: CharacterListPresenter) {
@@ -33,15 +41,16 @@ final class CharacterListViewController: UIViewController {
     }
     
     private func addSubviews() {
-        view.addSubview(contentView)
+        view.addSubview(charactersTableView)
     }
     
     private func addContraints() {
+        let safeAreaLayoutGuide = view.safeAreaLayoutGuide
         NSLayoutConstraint.activate([
-            contentView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            contentView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            contentView.topAnchor.constraint(equalTo: view.topAnchor),
-            contentView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            charactersTableView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+            charactersTableView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+            charactersTableView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            charactersTableView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
         ])
     }
     
@@ -50,14 +59,32 @@ final class CharacterListViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] (state, dataProvider) in
                 guard let self else { return }
-                contentView.update(state: state, dataProvider: dataProvider)
+                self.dataProvider = dataProvider
+                
+                let snapshot = dataProvider.snapshot(with: state)
+                dataSource.apply(snapshot)
             }
             .store(in: &cancellables)
     }
+    
+    private func makeDataSource() -> UITableViewDiffableDataSource<CharacterListDataProvider.Section, CharacterListDataProvider.Item> {
+        UITableViewDiffableDataSource(tableView: charactersTableView) { [weak self] tableView, indexPath, item in
+            guard let self,
+                  let visitableItem = dataProvider?.visitableItem(for: indexPath)
+            else { return UITableViewCell() }
+            
+            let visitor = CharacterListConfigureCellVisitor(tableView: tableView, indexPath: indexPath)
+            
+            visitableItem.accept(visitor)
+            return visitor.cell
+        }
+    }
 }
 
-extension CharacterListViewController: CharacterListContentViewDelegate {
-    func didTapLoadMore() {
-        presenter.loadCharacters()
+extension CharacterListViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let visitableItem = dataProvider?.visitableItem(for: indexPath) else { return }
+        let visitor = CharacterListDidSelectCellVisitor(presenter: presenter)
+        visitableItem.accept(visitor)
     }
 }

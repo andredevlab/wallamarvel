@@ -11,14 +11,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
         
         let characterService = CharacterServiceFactory.make()
-        let remoteDataSource = CharacterRemoteDataSourceImpl(characterService: characterService)
-        let localDataSource = CharacterLocalDataSourceImpl()
-        let characterRepository = CharacterRepositoryImpl(remoteDataSource: remoteDataSource,
-                                                       localDataSource: localDataSource)
-        let canLoadMoreCharactersUseCase = CanLoadMoreCharactersUseCaseImpl(repository: characterRepository)
-        let getCharactersListUseCase = GetCharactersListUseCaseImpl(repository: characterRepository)
-        let presenter = CharacterListPresenterImpl(getCharactersListUseCase: getCharactersListUseCase, 
-                                                   canLoadMoreCharactersUseCase: canLoadMoreCharactersUseCase)
+        let characterRepository = CharacterRepositoryImpl(remoteDataSource: CharacterRemoteDataSourceImpl(characterService: characterService),
+                                                       localDataSource: CharacterLocalDataSourceImpl())
+        
+        let presenter = CharacterListPresenterImpl(getCharactersListUseCase: GetCharactersListUseCaseImpl(repository: characterRepository),
+                                                   canLoadMoreCharactersUseCase: CanLoadMoreCharactersUseCaseImpl(repository: characterRepository),
+                                                   characterListDataProvider: CharacterListDataProvider())
+        
         let viewController = CharacterListViewController(presenter: presenter)
         
         let navigationController = UINavigationController(rootViewController: viewController)
