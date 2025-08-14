@@ -32,4 +32,9 @@ final class CharacterRepositoryImpl: CharacterRepository {
             throw error
         }
     }
+    
+    func fetchCharacter(id: Int) async throws -> CharacterModel {
+        let dto = try await remoteDataSource.fetchCharacter(id: id)
+        return CharacterMapper.map(dto)
+    }
 }

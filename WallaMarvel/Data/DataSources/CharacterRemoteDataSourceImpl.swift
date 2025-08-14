@@ -18,6 +18,16 @@ final class CharacterRemoteDataSourceImpl: CharacterRemoteDataSource {
         }
     }
     
+    func fetchCharacter(id: Int) async throws -> CharacterDTO {
+        do {
+            return try await characterService.fetchCharacter(id: id)
+        } catch let error as NetworkError {
+            throw CharacterRemoteDataSourceImpl.handleAPIClientError(with: error)
+        } catch {
+            throw error
+        }
+    }
+    
     private static func handleAPIClientError(with error: NetworkError) -> CharacterDataSourceError {
         CharacterDataSourceError.unknown
     }
