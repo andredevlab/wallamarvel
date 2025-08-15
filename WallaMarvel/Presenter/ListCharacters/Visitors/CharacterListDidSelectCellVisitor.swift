@@ -8,11 +8,11 @@ final class CharacterListDidSelectCellVisitor: CharacterListItemVisitor {
     }
     
     func visit(_ viewModel: CharacterListItemViewModel) {
-        // TODO: - Redirect to Detail
+        presenter.selectCharacter(id: viewModel.id)
     }
     
     func visit(_ viewModel: CharacterListStateViewModel) {
-        guard viewModel.state == .loadMore else { return }
+        guard viewModel.state != .loading || viewModel.state != .reachEnd else { return }
         presenter.loadCharacters()
     }
 }

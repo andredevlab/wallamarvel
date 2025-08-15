@@ -1,6 +1,6 @@
 import Foundation
 
-actor CharacterLocalDataSourceImpl: CharacterLocalDataSource {
+final class CharacterLocalDataSourceImpl: CharacterLocalDataSource {
     private let fileManager: FileManager = .default
     private let dirURL: URL
     
@@ -18,11 +18,7 @@ actor CharacterLocalDataSourceImpl: CharacterLocalDataSource {
         }
         
         let data = try Data(contentsOf: fileURL)
-        do {
-            return try JSONDecoder().decode([CharacterModel].self, from: data)
-        } catch {
-            throw error
-        }
+        return try JSONDecoder().decode([CharacterModel].self, from: data)
     }
     
     func save(page: Int, characters: [CharacterModel]) async {
@@ -32,8 +28,29 @@ actor CharacterLocalDataSourceImpl: CharacterLocalDataSource {
         }
     }
     
+    func fetch(id: Int) async throws -> CharacterModel {
+        let fileURL = urlForCharacterId(id)
+        guard fileManager.fileExists(atPath: fileURL.path) else {
+            throw CharacterDataSourceError.unavailable
+        }
+        
+        let data = try Data(contentsOf: fileURL)
+        return try JSONDecoder().decode(CharacterModel.self, from: data)
+    }
+    
+    func save(character: CharacterModel) async {
+        let fileURL = urlForCharacterId(character.id)
+        if let data = try? JSONEncoder().encode(character) {
+            try? data.write(to: fileURL, options: [.atomic])
+        }
+    }
+    
     // MARK: - Helpers
+    
     private func urlForPage(_ page: Int) -> URL {
         dirURL.appendingPathComponent("page_\(page).json", isDirectory: false)
+    }
+    private func urlForCharacterId(_ id: Int) -> URL {
+        dirURL.appendingPathComponent("character_id_\(id).json", isDirectory: false)
     }
 }

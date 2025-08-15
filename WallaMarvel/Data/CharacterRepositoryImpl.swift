@@ -32,4 +32,18 @@ final class CharacterRepositoryImpl: CharacterRepository {
             throw error
         }
     }
+    
+    func fetchCharacter(id: Int) async throws -> CharacterModel {
+        do {
+            let cachedModels = try await localDataSource.fetch(id: id)
+            return cachedModels
+        } catch let error as CharacterDataSourceError where error == .unavailable {
+            let dto = try await remoteDataSource.fetchCharacter(id: id)
+            let model = CharacterMapper.map(dto)
+            await localDataSource.save(character: model)
+            return model
+        } catch {
+            throw error
+        }
+    }
 }
