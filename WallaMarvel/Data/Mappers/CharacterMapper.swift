@@ -10,9 +10,9 @@ struct CharacterMapper {
                        species: dto.species,
                        type: dto.type,
                        gender: dto.gender,
-                       origin: LocationModel(name: dto.origin.name, url: dto.origin.url),
-                       location: LocationModel(name: dto.location.name, url: dto.location.url),
-                       episode: dto.episode.compactMap { $0 },
+                       origin: LocationModel(name: dto.origin.name, url: URL(string: dto.origin.url)),
+                       location: LocationModel(name: dto.location.name, url: URL(string: dto.location.url)),
+                       episode: dto.episode.compactMap { URL(string: $0) },
                        url: dto.url,
                        created: dto.created)
     }

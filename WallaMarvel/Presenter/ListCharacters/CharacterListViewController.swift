@@ -74,7 +74,6 @@ final class CharacterListViewController: UIViewController {
             else { return UITableViewCell() }
             
             let visitor = CharacterListConfigureCellVisitor(tableView: tableView, indexPath: indexPath)
-            
             visitableItem.accept(visitor)
             return visitor.cell
         }

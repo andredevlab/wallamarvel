@@ -1,11 +1,16 @@
 import Foundation
 import Combine
 
+protocol CharacterListPresenterCoordinatorDelegate: AnyObject {
+    func showCharacterDetail(with id: Int)
+}
+
 protocol CharacterListPresenter: AnyObject {
     var statePublisher: AnyPublisher<(CharacterListState, CharacterListDataProvider), Never> { get }
     
     func screenTitle() -> String
     func loadCharacters()
+    func selectCharacter(id: Int)
 }
 
 final class CharacterListPresenterImpl: CharacterListPresenter {
@@ -19,6 +24,8 @@ final class CharacterListPresenterImpl: CharacterListPresenter {
     private let characterListDataProvider: CharacterListDataProvider
     
     // MARK: Internal Properties
+    
+    weak var coordinatorDelegate: CharacterListPresenterCoordinatorDelegate?
     
     var statePublisher: AnyPublisher<(CharacterListState, CharacterListDataProvider), Never> {
         $listState
@@ -40,7 +47,7 @@ final class CharacterListPresenterImpl: CharacterListPresenter {
     
     func screenTitle() -> String {
         // TODO: - L10n
-        "List of Heroes"
+        "List of Characters"
     }
     
     func loadCharacters() {
@@ -55,6 +62,10 @@ final class CharacterListPresenterImpl: CharacterListPresenter {
                 listState = canLoadMoreCharactersUseCase.execute() ? .error : .reachEnd
             }
         }
+    }
+    
+    func selectCharacter(id: Int) {
+        coordinatorDelegate?.showCharacterDetail(with: id)
     }
 }
 

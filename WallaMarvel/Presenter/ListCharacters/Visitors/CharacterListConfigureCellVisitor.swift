@@ -21,7 +21,6 @@ final class CharacterListConfigureCellVisitor: CharacterListItemVisitor {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "ListStateViewCell",
                                                        for: indexPath) as? ListStateViewCell else { return }
         cell.configure(viewModel: viewModel)
-        
         self.cell = cell
     }
 }
