@@ -1,3 +1,5 @@
+The final version is available in the commit **release(v1) Final Test Version (#6)** in the main branch. This PR also contains screenshot videos and a detailed explanation of the logic process.
+
 # iOS Tech Test – Implementation Plan
 
 ## Overview  
