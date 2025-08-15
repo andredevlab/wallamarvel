@@ -42,6 +42,9 @@
 		16E7F17F2E4F681300E32172 /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E7F17E2E4F681300E32172 /* SectionHeader.swift */; };
 		16E7F1812E4F68B700E32172 /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E7F1802E4F68B700E32172 /* Card.swift */; };
 		16E7F1832E4F6B9A00E32172 /* CharacterDetailHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E7F1822E4F6B9A00E32172 /* CharacterDetailHeader.swift */; };
+		16E7F1872E4F870C00E32172 /* FilterOptionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E7F1862E4F870C00E32172 /* FilterOptionViewCell.swift */; };
+		16E7F1892E4FD9A900E32172 /* PulsingDot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E7F1882E4FD9A900E32172 /* PulsingDot.swift */; };
+		16E7F18B2E4FE29400E32172 /* CapsuleStrokeCA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E7F18A2E4FE29400E32172 /* CapsuleStrokeCA.swift */; };
 		1A0E3A992862F7E200132FCB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0E3A982862F7E200132FCB /* AppDelegate.swift */; };
 		1A0E3A9B2862F7E200132FCB /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0E3A9A2862F7E200132FCB /* SceneDelegate.swift */; };
 		1A0E3A9D2862F7E200132FCB /* CharacterListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0E3A9C2862F7E200132FCB /* CharacterListViewController.swift */; };
@@ -112,6 +115,9 @@
 		16E7F17E2E4F681300E32172 /* SectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeader.swift; sourceTree = "<group>"; };
 		16E7F1802E4F68B700E32172 /* Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
 		16E7F1822E4F6B9A00E32172 /* CharacterDetailHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDetailHeader.swift; sourceTree = "<group>"; };
+		16E7F1862E4F870C00E32172 /* FilterOptionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterOptionViewCell.swift; sourceTree = "<group>"; };
+		16E7F1882E4FD9A900E32172 /* PulsingDot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulsingDot.swift; sourceTree = "<group>"; };
+		16E7F18A2E4FE29400E32172 /* CapsuleStrokeCA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapsuleStrokeCA.swift; sourceTree = "<group>"; };
 		1A0E3A952862F7E200132FCB /* WallaMarvel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WallaMarvel.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A0E3A982862F7E200132FCB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1A0E3A9A2862F7E200132FCB /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -227,6 +233,7 @@
 			children = (
 				16E7F1492E4BF3B100E32172 /* ListStateViewCell.swift */,
 				1A3B7327286ADEE6007BF626 /* CharacterItemViewCell.swift */,
+				16E7F1862E4F870C00E32172 /* FilterOptionViewCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -288,6 +295,8 @@
 				16E7F17C2E4F656700E32172 /* FactRow.swift */,
 				16E7F17E2E4F681300E32172 /* SectionHeader.swift */,
 				16E7F1802E4F68B700E32172 /* Card.swift */,
+				16E7F1882E4FD9A900E32172 /* PulsingDot.swift */,
+				16E7F18A2E4FE29400E32172 /* CapsuleStrokeCA.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -545,6 +554,7 @@
 				1A0E3A9D2862F7E200132FCB /* CharacterListViewController.swift in Sources */,
 				1AC0347F2863214900E93178 /* GetCharactersListUseCase.swift in Sources */,
 				16E7F17B2E4F635000E32172 /* MapRowLink.swift in Sources */,
+				16E7F18B2E4FE29400E32172 /* CapsuleStrokeCA.swift in Sources */,
 				160597E12E4A20560024CDB7 /* CharacterRepositoryImpl.swift in Sources */,
 				16E7F16C2E4E491000E32172 /* CharacterListCoordinator.swift in Sources */,
 				16E7F1542E4D56D800E32172 /* CharacterListDidSelectCellVisitor.swift in Sources */,
@@ -553,6 +563,7 @@
 				16E7F1472E4BE41100E32172 /* CanLoadMoreCharactersUseCase.swift in Sources */,
 				16E7F15A2E4D57DA00E32172 /* CharacterListVisitableItem.swift in Sources */,
 				16E7F1792E4F61D200E32172 /* StatusBadge.swift in Sources */,
+				16E7F1872E4F870C00E32172 /* FilterOptionViewCell.swift in Sources */,
 				1A821ED6286305590024D397 /* CharacterRemoteDataSourceImpl.swift in Sources */,
 				16E7F1832E4F6B9A00E32172 /* CharacterDetailHeader.swift in Sources */,
 				16E7F1642E4E12AF00E32172 /* LocationModel.swift in Sources */,
@@ -565,6 +576,7 @@
 				16E7F1702E4E4B5F00E32172 /* CharacterDetailCoordinator.swift in Sources */,
 				16E7F1582E4D57C900E32172 /* CharacterListItemVisitor.swift in Sources */,
 				16E7F1522E4D4D8600E32172 /* CharacterListConfigureCellVisitor.swift in Sources */,
+				16E7F1892E4FD9A900E32172 /* PulsingDot.swift in Sources */,
 				1A3B732A286AE195007BF626 /* CharacterListDataProvider.swift in Sources */,
 				1A821EDA2863096C0024D397 /* CharacterListPresenterImpl.swift in Sources */,
 				160597E42E4A21630024CDB7 /* GetCharactersListUseCaseImpl.swift in Sources */,

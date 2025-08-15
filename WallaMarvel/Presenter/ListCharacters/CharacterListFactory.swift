@@ -8,11 +8,13 @@ final class CharacterListFactory {
     }
     
     func make(delegate: CharacterListPresenterCoordinatorDelegate?) -> UIViewController {
+        let characterListDataProvider = CharacterListDataProvider()
         let presenter = CharacterListPresenterImpl(getCharactersListUseCase: GetCharactersListUseCaseImpl(repository: characterRepository),
                                                    canLoadMoreCharactersUseCase: CanLoadMoreCharactersUseCaseImpl(repository: characterRepository),
-                                                   characterListDataProvider: CharacterListDataProvider())
+                                                   characterListDataProvider: characterListDataProvider)
         presenter.coordinatorDelegate = delegate
-        let viewController = CharacterListViewController(presenter: presenter)
+        let viewController = CharacterListViewController(presenter: presenter, 
+                                                         characterListDataProvider: characterListDataProvider)
         return viewController
     }
 }

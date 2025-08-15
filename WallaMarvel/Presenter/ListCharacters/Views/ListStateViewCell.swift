@@ -95,7 +95,7 @@ final class ListStateViewCell: UITableViewCell {
             button.isHidden = false
             label.isHidden = true
             
-        case .loading:
+        case .loadingMore, .loadingFilter:
             spinner.startAnimating()
             label.text = "Loading"
             

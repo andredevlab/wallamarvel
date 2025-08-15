@@ -12,7 +12,11 @@ final class CharacterListDidSelectCellVisitor: CharacterListItemVisitor {
     }
     
     func visit(_ viewModel: CharacterListStateViewModel) {
-        guard viewModel.state != .loading || viewModel.state != .reachEnd else { return }
+        guard viewModel.state != .loadingMore
+                || viewModel.state != .loadingFilter
+                || viewModel.state != .reachEnd
+        else { return }
+        
         presenter.loadCharacters()
     }
 }

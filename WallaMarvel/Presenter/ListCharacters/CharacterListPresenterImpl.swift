@@ -6,31 +6,37 @@ protocol CharacterListPresenterCoordinatorDelegate: AnyObject {
 }
 
 protocol CharacterListPresenter: AnyObject {
-    var statePublisher: AnyPublisher<(CharacterListState, CharacterListDataProvider), Never> { get }
+    var statePublisher: AnyPublisher<CharacterListState, Never> { get }
     
     func screenTitle() -> String
     func loadCharacters()
+    func loadCharacters(with: CharacterListFilter)
     func selectCharacter(id: Int)
+}
+
+enum CharacterListFilter: Equatable {
+    case none
+    case name(String)
 }
 
 final class CharacterListPresenterImpl: CharacterListPresenter {
     
     // MARK: Private Properties
     
-    @Published private var listState: CharacterListState = .loading
-    
     private let getCharactersListUseCase: GetCharactersListUseCase
     private let canLoadMoreCharactersUseCase: CanLoadMoreCharactersUseCase
     private let characterListDataProvider: CharacterListDataProvider
+    
+    @Published private var listState: CharacterListState = .loadingMore
+    private let filterSubject = CurrentValueSubject<CharacterListFilter, Never>(.none)
+    private var cancellables = Set<AnyCancellable>()
     
     // MARK: Internal Properties
     
     weak var coordinatorDelegate: CharacterListPresenterCoordinatorDelegate?
     
-    var statePublisher: AnyPublisher<(CharacterListState, CharacterListDataProvider), Never> {
-        $listState
-            .map { [unowned self] in ($0, self.characterListDataProvider) }
-            .eraseToAnyPublisher()
+    var statePublisher: AnyPublisher<CharacterListState, Never> {
+        $listState.eraseToAnyPublisher()
     }
     
     // MARK: Initialization
@@ -41,6 +47,23 @@ final class CharacterListPresenterImpl: CharacterListPresenter {
         self.getCharactersListUseCase = getCharactersListUseCase
         self.canLoadMoreCharactersUseCase = canLoadMoreCharactersUseCase
         self.characterListDataProvider = characterListDataProvider
+        
+        setupSubscribers()
+    }
+    
+    // MARK: Private Methods
+    
+    private func setupSubscribers() {
+        // Using a filterSubject to debounce the inputs and save processing resources
+        filterSubject
+            .debounce(for: .seconds(1), scheduler: DispatchQueue.main)
+            .sink(receiveValue: {  [weak self] filter in
+                guard let self else { return }
+                
+                characterListDataProvider.apply(filter: filter)
+                listState = filter == .none ? .loadMore : .reachEnd
+            })
+            .store(in: &cancellables)
     }
     
     // MARK: Internal Methods
@@ -51,7 +74,7 @@ final class CharacterListPresenterImpl: CharacterListPresenter {
     }
     
     func loadCharacters() {
-        listState = .loading
+        listState = .loadingMore
         
         Task {
             do {
@@ -66,6 +89,11 @@ final class CharacterListPresenterImpl: CharacterListPresenter {
     
     func selectCharacter(id: Int) {
         coordinatorDelegate?.showCharacterDetail(with: id)
+    }
+    
+    func loadCharacters(with filter: CharacterListFilter) {
+        listState = .loadingFilter
+        filterSubject.send(filter)
     }
 }
 

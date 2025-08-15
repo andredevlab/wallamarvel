@@ -9,7 +9,7 @@ struct Tag: View {
             .background(
                 Capsule().fill(Color(UIColor.systemGray6))
             )
-            .overlay(Capsule().stroke(Color.white.opacity(0.15), lineWidth: 1))
+            .overlay(Capsule().stroke(Color.white.opacity(0.5), lineWidth: 1))
     }
 }
 
